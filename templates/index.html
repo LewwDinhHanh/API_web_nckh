@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dự đoán bệnh lá cây</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        form {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-label {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4caf50;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .file-label:hover {
+            background-color: #45a049;
+        }
+
+        .file-name {
+            display: inline-block;
+            margin-left: 10px;
+            color: #777;
+        }
+
+        input[type="submit"] {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .error {
+            color: red;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .result {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .result img {
+            max-width: 100%;
+            margin-top: 30px;
+            border-radius: 5px;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Dự đoán bệnh lá cây</h1>
+        <form method="POST" action="/detect" enctype="multipart/form-data">
+            <label class="file-label">
+                Chọn File
+                <input type="file" name="file" accept="image/*">
+            </label>
+            <span class="file-name">Chưa có File</span>
+            <br>
+            <input type="submit" value="Tải lên và dự đoán">
+        </form>
+        <div class="error">
+            {% if error %}
+                {{ error }}
+            {% endif %}
+        </div>
+        <div class="result">
+            {% if data %}
+                {% for obj in data.result %}
+                    {% if obj.class == 'c-dom-la' %}
+                        <p>Dự đoán: Bệnh đốm lá</p>
+                    {% elif obj.class == 'c-khoe-manh' %}
+                        <p>Dự đoán: Lá khỏe mạnh</p>
+                    {% endif %}
+                    <p>Độ tin cậy: {{ '{:.4f}'.format(obj.confidence) }}</p>
+                {% endfor %}
+                <img src="{{ data.image }}" alt="Detected Object">
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.querySelector('input[type="file"]');
+        const fileName = document.querySelector('.file-name');
+
+        fileInput.addEventListener('change', function() {
+            fileName.textContent = this.files[0].name;
+        });
+    </script>
+</body>
+</html>
